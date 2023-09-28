@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34112.27
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPSReader", "GPSReader\GPSReader.csproj", "{3638DA5D-E552-4D1B-88AD-D0270BE6D661}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GPSReader", "GPSReader\GPSReader.csproj", "{3638DA5D-E552-4D1B-88AD-D0270BE6D661}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GPSReader.Tests", "GPSReader.Tests\GPSReader.Tests.csproj", "{8E98003F-E850-47B4-BDF0-21ED7EA16481}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{0AE731FE-87AA-4ABF-9581-398C9C54A39B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{84BC7CA0-1900-4631-9BB9-F8123E9BB5D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +21,20 @@ Global
 		{3638DA5D-E552-4D1B-88AD-D0270BE6D661}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3638DA5D-E552-4D1B-88AD-D0270BE6D661}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3638DA5D-E552-4D1B-88AD-D0270BE6D661}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E98003F-E850-47B4-BDF0-21ED7EA16481}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E98003F-E850-47B4-BDF0-21ED7EA16481}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E98003F-E850-47B4-BDF0-21ED7EA16481}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E98003F-E850-47B4-BDF0-21ED7EA16481}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84BC7CA0-1900-4631-9BB9-F8123E9BB5D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84BC7CA0-1900-4631-9BB9-F8123E9BB5D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84BC7CA0-1900-4631-9BB9-F8123E9BB5D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84BC7CA0-1900-4631-9BB9-F8123E9BB5D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{84BC7CA0-1900-4631-9BB9-F8123E9BB5D5} = {0AE731FE-87AA-4ABF-9581-398C9C54A39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {20912F6D-89E7-4426-AE3C-794DF224C41B}

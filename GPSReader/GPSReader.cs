@@ -1,68 +1,66 @@
-﻿using System;
-using System.IO.Ports;
-using System.Collections.Generic;
-using GPSReader.Exceptions;
-using GPSReader.Interfaces;
-using GPSReader.EventArgs;
+﻿using GPSReader.Parsers;
+using Microsoft.Extensions.Logging;
 
-namespace GPSReader
+namespace GPSReader;
+
+public class GPSReaderService
 {
-    public class GPSReader
+    private INMEAInput _input;
+    private List<INMEAParser> _parsers;
+    private readonly ILogger<GPSReaderService> _logger;
+
+    public event EventHandler<GPGGAEventArgs> OnGPGGAUpdated;
+
+    public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input, IEnumerable<INMEAParser> parsers)
     {
-        private string comPortName;
-        private int baudRate;
-        private SerialPort serialPort;
-        private List<INMEAParser> parsers;
+        _logger = logger;
+        _input = input;
+        _parsers = new List<INMEAParser>(parsers);
+    }
 
-        public event EventHandler<LocationEventArgs> LocationUpdated;
+    public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input) : this(logger, input,
+        new List<INMEAParser> { new GPGGAParser() })
+    {
+    }
 
-        public GPSReader(string comPortName, int baudRate, IEnumerable<INMEAParser> parsers)
+    public void StartReading()
+    {
+        try
         {
-            this.comPortName = comPortName;
-            this.baudRate = baudRate;
-            this.parsers = new List<INMEAParser>(parsers);
-            serialPort = new SerialPort(comPortName, baudRate);
+            _input.Open();
+            _input.DataReceived += DataReceived;
         }
-
-        public void StartReading()
+        catch (Exception ex)
         {
-            try
-            {
-                serialPort.Open();
-                serialPort.DataReceived += new SerialDataReceivedEventHandler(SerialPort_DataReceived);
-            }
-            catch (Exception ex)
-            {
-                throw new GPSException("Failed to start reading: " + ex.Message);
-            }
+            _logger.LogError(ex, "Failed to start reading");
+            throw new GPSException("Failed to start reading: " + ex.Message);
         }
+    }
 
-        public void StopReading()
+    public void StopReading()
+    {
+        if (_input.IsOpen)
         {
-            if (serialPort.IsOpen)
-            {
-                serialPort.Close();
-            }
+            _input.Close();
         }
+    }
 
-        private void OnLocationUpdated(string latitude, string longitude)
+    private void DataReceived(object sender, InputReceivedEventArgs e)
+    {
+        string data = e.Data;
+        string[] sentences = data.Split('\n');
+
+        foreach (string sentence in sentences)
         {
-            LocationUpdated?.Invoke(this, new LocationEventArgs(latitude, longitude));
-        }
-
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            SerialPort sp = (SerialPort)sender;
-            string data = sp.ReadExisting();
-            string[] sentences = data.Split('\n');
-
-            foreach (string sentence in sentences)
+            foreach (var parser in _parsers)
             {
-                foreach (var parser in parsers)
+                if (parser.TryParse(sentence, out NMEAEventArgs eventArgs))
                 {
-                    if (parser.TryParse(sentence, out var location))
+                    switch (eventArgs)
                     {
-                        OnLocationUpdated(location.Latitude, location.Longitude);
+                        case GPGGAEventArgs gpggaEventArgs:
+                            OnGPGGAUpdated?.Invoke(this, gpggaEventArgs);
+                            break;
                     }
                 }
             }

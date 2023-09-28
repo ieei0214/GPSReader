@@ -1,23 +1,34 @@
-﻿using GPSReader.Interfaces;
+﻿using GPSReader.EventArgs;
+using GPSReader.Interfaces;
+using GPSReader.Models;
+using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GPSReader.Parsers;
 
 public class GPGGAParser : INMEAParser
 {
-    public bool TryParse(string sentence, out (string Latitude, string Longitude) location)
+    public string SentenceId => "GPGGA";
+
+    public bool TryParse(string sentence, out NMEAEventArgs eventArgs)
     {
-        if (sentence.StartsWith("$GPGGA"))
+        if (sentence.StartsWith($"${SentenceId}"))
         {
             string[] fields = sentence.Split(',');
 
-            if (fields.Length > 6 && !string.IsNullOrEmpty(fields[3]) && !string.IsNullOrEmpty(fields[5]))
+            if (fields.Length >= 15)
             {
-                location = (fields[3] + " " + fields[4], fields[5] + " " + fields[6]);
+                eventArgs = new GPGGAEventArgs(sentence, GPGGAData.CreateFromFields(fields));
                 return true;
+            }
+            else
+            {
+                Debug.WriteLine("Insufficient fields in GPGGA sentence");
             }
         }
 
-        location = (null, null);
+        eventArgs = null;
+        Debug.WriteLine($"Failed to parse: {sentence}");
         return false;
     }
 }
