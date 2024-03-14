@@ -19,12 +19,6 @@ namespace GPSReader.Tests
         {
             mockInputSource = Substitute.For<INMEAInput>();
             logger = Substitute.For<Microsoft.Extensions.Logging.ILogger<GPSReaderService>>();
-
-            var parsers = new List<BaseNMEAParser>
-            {
-                new GPGGAParser(),
-                new GPGSAParser(),
-            };
             gpsReader = new GPSReaderService(logger, mockInputSource);
         }
 
@@ -36,13 +30,14 @@ namespace GPSReader.Tests
             var GPGGAUpdated = false;
 
             gpsReader.OnGPGGAUpdated += (sender, e) => GPGGAUpdated = true;
-            mockInputSource.DataReceived += Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
 
             gpsReader.StopReading();
 
             GPGGAUpdated.Should().BeTrue();
         }
-        
+
         [Theory]
         [InlineData("$GPGSA,A,1,22,17,14,24,,,,,,,,,57.14,57.13,1.00*03")]
         public void Test_OnGPGSAUpdated(string inputNemm)
@@ -51,11 +46,28 @@ namespace GPSReader.Tests
             var GPGSAUpdated = false;
 
             gpsReader.OnGPGSAUpdated += (sender, e) => GPGSAUpdated = true;
-            mockInputSource.DataReceived += Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
 
             gpsReader.StopReading();
 
             GPGSAUpdated.Should().BeTrue();
+        }
+
+        [Theory]
+        [InlineData("$GPGLL,,,,,211123.00,V,N*48")]
+        public void Test_OnGPGLLUpdated(string inputNemm)
+        {
+            gpsReader.StartReading();
+            var GPGLLUpdated = false;
+
+            gpsReader.OnGPGLLUpdated += (sender, e) => GPGLLUpdated = true;
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+
+            gpsReader.StopReading();
+
+            GPGLLUpdated.Should().BeTrue();
         }
 
         [Theory]
@@ -64,12 +76,13 @@ namespace GPSReader.Tests
         {
             gpsReader.StartReading();
             GPGGAEventArgs gpggaEventArgs = null;
-        
+
             gpsReader.OnGPGGAUpdated += (sender, e) => gpggaEventArgs = e;
-            mockInputSource.DataReceived += Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
 
             gpsReader.StopReading();
-        
+
             // Assert
             gpggaEventArgs.Should().NotBeNull();
             gpggaEventArgs.GPGGAData.UTC.Should().Be("123519");
@@ -111,6 +124,32 @@ namespace GPSReader.Tests
             value.HDOP.Should().Be("57.17");
             value.VDOP.Should().Be("1.00");
             value.Checksum.Should().Be("0D");
+        }
+
+        [Theory]
+        [InlineData("$GPGLL,,,,,211123.00,V,N*48")]
+        public void Test_GPGLLEventArgs(string inputNemm)
+        {
+            gpsReader.StartReading();
+            GPGLLEventArgs gpgllEventArgs = null;
+
+            gpsReader.OnGPGLLUpdated += (sender, e) => gpgllEventArgs = e;
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+
+            gpsReader.StopReading();
+
+            // Assert
+            gpgllEventArgs.Should().NotBeNull();
+            var value = gpgllEventArgs.GPGLLData;
+            value.Latitude.Should().BeNull();
+            value.LatitudeHemisphere.Should().BeNull();
+            value.Longitude.Should().BeNull();
+            value.LongitudeHemisphere.Should().BeNull();
+            value.UTC.Should().Be("211123.00");
+            value.PositionStatus.Should().Be("V");
+            value.ModeIndicator.Should().Be("N");
+            value.Checksum.Should().Be("48");
         }
     }
 }
