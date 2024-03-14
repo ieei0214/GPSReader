@@ -6,9 +6,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GPSReader.Parsers;
 
-public class GPGGAParser : INMEAParser
+public class GPGSAParser : INMEAParser
 {
-    public string SentenceId => "GPGGA";
+    public string SentenceId => "GPGSA";
 
     public bool TryParse(string sentence, out NMEAEventArgs eventArgs)
     {
@@ -20,9 +20,9 @@ public class GPGGAParser : INMEAParser
 
             if (fields.Length >= 15)
             {
-                var data = GPGGAData.CreateFromFields(fields);
+                var data = GPGSAData.CreateFromFields(fields);
                 data.Checksum = checkSum;
-                eventArgs = new GPGGAEventArgs(sentence, data);
+                eventArgs = new GPGSAEventArgs(sentence, data);
                 return true;
             }
             else

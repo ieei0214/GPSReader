@@ -10,6 +10,7 @@ public class GPSReaderService
     private readonly ILogger<GPSReaderService> _logger;
 
     public event EventHandler<GPGGAEventArgs> OnGPGGAUpdated;
+    public event EventHandler<GPGSAEventArgs> OnGPGSAUpdated;
 
     public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input, IEnumerable<INMEAParser> parsers)
     {
@@ -19,7 +20,7 @@ public class GPSReaderService
     }
 
     public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input) : this(logger, input,
-        new List<INMEAParser> { new GPGGAParser() })
+        new List<INMEAParser> { new GPGGAParser(), new GPGSAParser()})
     {
     }
 
@@ -60,6 +61,9 @@ public class GPSReaderService
                     {
                         case GPGGAEventArgs gpggaEventArgs:
                             OnGPGGAUpdated?.Invoke(this, gpggaEventArgs);
+                            break;
+                        case GPGSAEventArgs gpgsaEventArgs:
+                            OnGPGSAUpdated?.Invoke(this, gpgsaEventArgs);
                             break;
                     }
                 }

@@ -19,93 +19,54 @@ namespace GPSReader.Tests
         {
             mockInputSource = Substitute.For<INMEAInput>();
             logger = Substitute.For<Microsoft.Extensions.Logging.ILogger<GPSReaderService>>();
+
+            var parsers = new List<INMEAParser>
+            {
+                new GPGGAParser(),
+                new GPGSAParser(),
+            };
             gpsReader = new GPSReaderService(logger, mockInputSource);
         }
 
         [Theory]
         [InlineData("$GPGGA,123519,4807.038,N,01131.324,E,1,08,0.9,545.4,M,46.9,M,,*42")]
-        public void Test_OnGPGGAUpdated(string gpggaNemm)
+        public void Test_OnGPGGAUpdated(string inputNemm)
         {
             gpsReader.StartReading();
             var GPGGAUpdated = false;
 
             gpsReader.OnGPGGAUpdated += (sender, e) => GPGGAUpdated = true;
-            mockInputSource.DataReceived += Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(gpggaNemm));
+            mockInputSource.DataReceived += Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
 
             gpsReader.StopReading();
 
             GPGGAUpdated.Should().BeTrue();
         }
-
-        public static bool AreEquivalent(GPGGAData expected, GPGGAData actual)
+        
+        [Theory]
+        [InlineData("$GPGSA,A,1,22,17,14,24,,,,,,,,,57.14,57.13,1.00*03")]
+        public void Test_OnGPGSAUpdated(string inputNemm)
         {
-            return expected.UTC == actual.UTC &&
-                   expected.Latitude == actual.Latitude &&
-                   expected.Longitude == actual.Longitude &&
-                   expected.Quality == actual.Quality &&
-                   expected.Satellites == actual.Satellites &&
-                   expected.HDOP == actual.HDOP &&
-                   expected.Altitude == actual.Altitude &&
-                   expected.AltitudeUnits == actual.AltitudeUnits &&
-                   expected.GeoidHeight == actual.GeoidHeight &&
-                   expected.GeoidHeightUnits == actual.GeoidHeightUnits &&
-                   expected.DGPSDataAge == actual.DGPSDataAge &&
-                   expected.Checksum == actual.Checksum;
-        }
+            gpsReader.StartReading();
+            var GPGSAUpdated = false;
 
-        public static IEnumerable<object[]> GPGGADataTestData()
-        {
-            yield return new object[]
-            {
-                "$GPGGA,123519,4807.038,N,01131.324,E,1,08,0.9,545.4,M,46.9,M,,*42",
-                new GPGGAData
-                {
-                    UTC = "123519",
-                    Latitude = "48.1173",
-                    Longitude = "11.5221",
-                    Quality = 1,
-                    Satellites = 8,
-                    HDOP = 0.9,
-                    Altitude = 545.4,
-                    AltitudeUnits = "M",
-                    GeoidHeight = 46.9,
-                    GeoidHeightUnits = "M",
-                    DGPSDataAge = "",
-                    Checksum = "*42"
-                }
-            };
-            
-        }
+            gpsReader.OnGPGSAUpdated += (sender, e) => GPGSAUpdated = true;
+            mockInputSource.DataReceived += Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
 
-        // [Theory]
-        // [MemberData(nameof(GPGGADataTestData))]
-        // public void Test_GPGGAEventArgs_B(string gpggaNmea, GPGGAData expectedGPGGAData)
-        // {
-        //     var mockInputSource = new MockInputSource();
-        //     var gpsReader = new GPSReaderService(mockInputSource);  // Provide parsers argument
-        //     gpsReader.StartReading();
-        //     GPGGAEventArgs gpggaEventArgs = null;
-        //
-        //     gpsReader.OnGPGGAUpdated += (sender, e) => gpggaEventArgs = e;
-        //     mockInputSource.SimulateDataReceived(gpggaNmea);
-        //
-        //     gpsReader.StopReading();
-        //
-        //     // Assert
-        //     gpggaEventArgs.Should().NotBeNull();
-        //     AreEquivalent(expectedGPGGAData, gpggaEventArgs.GPGGAData).Should().BeTrue();
-        // }
-        //
+            gpsReader.StopReading();
+
+            GPGSAUpdated.Should().BeTrue();
+        }
 
         [Theory]
         [InlineData("$GPGGA,123519,4807.038,N,01131.324,E,1,08,0.9,545.4,M,46.9,M,,*42")]
-        public void Test_GPGGAEventArgs(string gpggaNemm)
+        public void Test_GPGGAEventArgs(string inputNemm)
         {
             gpsReader.StartReading();
             GPGGAEventArgs gpggaEventArgs = null;
         
             gpsReader.OnGPGGAUpdated += (sender, e) => gpggaEventArgs = e;
-            mockInputSource.DataReceived += Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(gpggaNemm));
+            mockInputSource.DataReceived += Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
 
             gpsReader.StopReading();
         
@@ -124,9 +85,32 @@ namespace GPSReader.Tests
             gpggaEventArgs.GPGGAData.GeoidHeight.Should().BeApproximately(46.9, 0.1);
             gpggaEventArgs.GPGGAData.GeoidHeightUnits.Should().Be("M");
             gpggaEventArgs.GPGGAData.DGPSDataAge.Should().BeNull();
-            gpggaEventArgs.GPGGAData.Checksum.Should().Be("*42");
+            gpggaEventArgs.GPGGAData.Checksum.Should().Be("42");
         }
 
+        [Theory]
+        [InlineData("$GPGSA,A,1,22,17,14,,,,,,,,,,57.18,57.17,1.00*0D")]
+        public void Test_GPGSAEventArgs(string inputNemm)
+        {
+            gpsReader.StartReading();
+            GPGSAEventArgs gpgsaEventArgs = null;
 
+            gpsReader.OnGPGSAUpdated += (sender, e) => gpgsaEventArgs = e;
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+
+            gpsReader.StopReading();
+
+            // Assert
+            gpgsaEventArgs.Should().NotBeNull();
+            var value = gpgsaEventArgs.GPGSAData;
+            value.Mode.Should().Be("A");
+            value.FixStatus.Should().Be("1");
+            value.Satellites.Should().BeEquivalentTo("22", "17", "14");
+            value.PDOP.Should().Be("57.18");
+            value.HDOP.Should().Be("57.17");
+            value.VDOP.Should().Be("1.00");
+            value.Checksum.Should().Be("0D");
+        }
     }
 }
