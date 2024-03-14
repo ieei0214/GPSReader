@@ -20,7 +20,7 @@ namespace GPSReader.Tests
             mockInputSource = Substitute.For<INMEAInput>();
             logger = Substitute.For<Microsoft.Extensions.Logging.ILogger<GPSReaderService>>();
 
-            var parsers = new List<INMEAParser>
+            var parsers = new List<BaseNMEAParser>
             {
                 new GPGGAParser(),
                 new GPGSAParser(),

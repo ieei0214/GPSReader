@@ -35,10 +35,7 @@ public class GPGGAData : NMEAData
         return data;
     }
 
-    private static bool IsFieldNotEmpty(string field)
-    {
-        return !string.IsNullOrEmpty(field);
-    }
+
 
     private static string ConvertToDecimalDegrees(string degreesMinutes, string direction)
     {

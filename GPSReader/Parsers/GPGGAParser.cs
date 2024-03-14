@@ -6,17 +6,15 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GPSReader.Parsers;
 
-public class GPGGAParser : INMEAParser
+public class GPGGAParser : BaseNMEAParser
 {
-    public string SentenceId => "GPGGA";
+    public override string SentenceId => "GPGGA";
 
-    public bool TryParse(string sentence, out NMEAEventArgs eventArgs)
+    public override bool TryParse(string sentence, out NMEAEventArgs eventArgs)
     {
         if (sentence.StartsWith($"${SentenceId}"))
         {
-            var value = sentence.Split('*');
-            string[] fields = value[0].Split(',');
-            string checkSum = value[1];
+            var (fields, checkSum) = GetFieldAndChecksum(sentence);
 
             if (fields.Length >= 15)
             {

@@ -6,21 +6,21 @@ namespace GPSReader;
 public class GPSReaderService
 {
     private INMEAInput _input;
-    private List<INMEAParser> _parsers;
+    private List<BaseNMEAParser> _parsers;
     private readonly ILogger<GPSReaderService> _logger;
 
     public event EventHandler<GPGGAEventArgs> OnGPGGAUpdated;
     public event EventHandler<GPGSAEventArgs> OnGPGSAUpdated;
 
-    public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input, IEnumerable<INMEAParser> parsers)
+    public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input, IEnumerable<BaseNMEAParser> parsers)
     {
         _logger = logger;
         _input = input;
-        _parsers = new List<INMEAParser>(parsers);
+        _parsers = new List<BaseNMEAParser>(parsers);
     }
 
     public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input) : this(logger, input,
-        new List<INMEAParser> { new GPGGAParser(), new GPGSAParser()})
+        new List<BaseNMEAParser> { new GPGGAParser(), new GPGSAParser() })
     {
     }
 

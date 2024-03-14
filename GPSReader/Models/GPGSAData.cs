@@ -37,5 +37,4 @@ public class GPGSAData : NMEAData
         var vdop = fields[17];
         return new GPGSAData(mode, fixStatus, satellites, pdop, hdop, vdop);
     }
-    
 }
