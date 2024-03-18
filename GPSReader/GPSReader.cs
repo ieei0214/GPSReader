@@ -50,6 +50,7 @@ public class GPSReaderService
     private void DataReceived(object sender, InputReceivedEventArgs e)
     {
         string data = e.Data;
+        _logger.LogDebug(data);
         string[] sentences = data.Split('\n');
 
         foreach (string sentence in sentences)
