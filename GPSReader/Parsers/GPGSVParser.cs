@@ -20,18 +20,6 @@ public class GPGSVParser : BaseNMEAParser
             data.Checksum = checkSum;
             eventArgs = new GPGSVEventArgs(sentence, data);
             return true;
-
-            // if (fields.Length >= 15)
-            // {
-            //     var data = GPGSVData.CreateFromFields(fields);
-            //     data.Checksum = checkSum;
-            //     eventArgs = new GPGSVEventArgs(sentence, data);
-            //     return true;
-            // }
-            // else
-            // {
-            //     Debug.WriteLine($"Insufficient fields in {SentenceId} sentence");
-            // }
         }
 
         eventArgs = null;
