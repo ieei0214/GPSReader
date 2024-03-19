@@ -79,8 +79,12 @@ public class GPSReaderService
                         case GPGSVEventArgs gpgsvEventArgs:
                             _listGPGSVDatas.Add(gpgsvEventArgs.GPGSVData);
                             OnGPGSVUpdated?.Invoke(this, gpgsvEventArgs);
-                            if(_listGPGSVDatas.Count == Int32.Parse(gpgsvEventArgs.GPGSVData.DataCount))
-                                OnGPGSVListUpdated?.Invoke(this, new GPGSVListEventArgs(_listGPGSVDatas));
+                            if (_listGPGSVDatas.Count == Int32.Parse(gpgsvEventArgs.GPGSVData.DataCount))
+                            {
+                                OnGPGSVListUpdated?.Invoke(this, new GPGSVListEventArgs(new List<GPGSVData>(_listGPGSVDatas)));
+                                _listGPGSVDatas.Clear();
+                            }
+
                             break;
                     }
                 }
