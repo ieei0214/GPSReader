@@ -1,4 +1,5 @@
-﻿using GPSReader.Parsers;
+﻿using GPSReader.Models;
+using GPSReader.Parsers;
 using Microsoft.Extensions.Logging;
 
 namespace GPSReader;
@@ -9,10 +10,13 @@ public class GPSReaderService
     private List<BaseNMEAParser> _parsers;
     private readonly ILogger<GPSReaderService> _logger;
 
+    private List<GPGSVData> _listGPGSVDatas = new List<GPGSVData>();
+
     public event EventHandler<GPGGAEventArgs> OnGPGGAUpdated;
     public event EventHandler<GPGSAEventArgs> OnGPGSAUpdated;
     public event EventHandler<GPGLLEventArgs> OnGPGLLUpdated;
     public event EventHandler<GPGSVEventArgs> OnGPGSVUpdated;
+    public event EventHandler<GPGSVListEventArgs> OnGPGSVListUpdated;
 
     public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input)
     {
@@ -73,7 +77,10 @@ public class GPSReaderService
                             OnGPGLLUpdated?.Invoke(this, gpgllEventArgs);
                             break;
                         case GPGSVEventArgs gpgsvEventArgs:
+                            _listGPGSVDatas.Add(gpgsvEventArgs.GPGSVData);
                             OnGPGSVUpdated?.Invoke(this, gpgsvEventArgs);
+                            if(_listGPGSVDatas.Count == Int32.Parse(gpgsvEventArgs.GPGSVData.DataCount))
+                                OnGPGSVListUpdated?.Invoke(this, new GPGSVListEventArgs(_listGPGSVDatas));
                             break;
                     }
                 }

@@ -227,5 +227,39 @@ namespace GPSReader.Tests
             value.Satellites[3].Azimuth.Should().Be(Azimuth4);
             value.Satellites[3].SNR.Should().Be(SNR4);
         }
+        
+        [Theory]
+        [InlineData("$GPGSV,3,1,12,05,22,165,31,06,31,041,27,11,69,043,33,12,76,332,36*74",
+            "$GPGSV,3,2,12,19,12,074,28,20,46,130,27,24,24,210,16,25,42,316,29*74",
+            "$GPGSV,3,3,12,28,04,325,,29,18,280,09,46,49,200,29,48,50,193,38*7E")]
+        public void Test_GPGSVListEventArgs(string inputNemm1, string inputNemm2, string inputNemm3)
+        {
+            gpsReader.StartReading();
+            GPGSVListEventArgs gpgsvListEventArgs = null;
+            int times = 0;
+
+            gpsReader.OnGPGSVListUpdated += (sender, e) =>
+            {
+                gpgsvListEventArgs = e;
+                times++;
+            };
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm1));
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm2));
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm3));
+
+            gpsReader.StopReading();
+
+            // Assert
+            gpgsvListEventArgs.Should().NotBeNull();
+            var value = gpgsvListEventArgs.GPGSVListData;
+            value.Count.Should().Be(3);
+            times.Should().Be(1);
+            value[0].DataCount.Should().Be("3");
+            value[1].DataCount.Should().Be("3");
+            value[2].DataCount.Should().Be("3");
+        }
     }
 } 
