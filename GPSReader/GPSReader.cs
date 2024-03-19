@@ -18,17 +18,22 @@ public class GPSReaderService
     public event EventHandler<GPGSVEventArgs> OnGPGSVUpdated;
     public event EventHandler<GPGSVListEventArgs> OnGPGSVListUpdated;
 
-    public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input)
+    public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input, List<BaseNMEAParser> parsers)
     {
         _logger = logger;
         _input = input;
-        _parsers = new List<BaseNMEAParser>
+        _parsers = parsers;
+    }
+
+    public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input)
+        : this(logger, input, new List<BaseNMEAParser>
         {
             new GPGGAParser(),
             new GPGSAParser(),
             new GPGLLParser(),
             new GPGSVParser()
-        };
+        })
+    {
     }
 
     public void StartReading()
@@ -81,7 +86,8 @@ public class GPSReaderService
                             OnGPGSVUpdated?.Invoke(this, gpgsvEventArgs);
                             if (_listGPGSVDatas.Count == Int32.Parse(gpgsvEventArgs.GPGSVData.DataCount))
                             {
-                                OnGPGSVListUpdated?.Invoke(this, new GPGSVListEventArgs(new List<GPGSVData>(_listGPGSVDatas)));
+                                OnGPGSVListUpdated?.Invoke(this,
+                                    new GPGSVListEventArgs(new List<GPGSVData>(_listGPGSVDatas)));
                                 _listGPGSVDatas.Clear();
                             }
 
