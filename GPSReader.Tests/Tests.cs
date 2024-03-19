@@ -71,6 +71,22 @@ namespace GPSReader.Tests
         }
 
         [Theory]
+        [InlineData("$GPGSV,4,1,13,05,04,174,37,06,51,046,35,11,80,138,34,12,53,324,25*7D")]
+        public void Test_OnGPGSVUpdated(string inputNemm)
+        {
+            gpsReader.StartReading();
+            var GPGSVUpdated = false;
+
+            gpsReader.OnGPGSVUpdated += (sender, e) => GPGSVUpdated = true;
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+
+            gpsReader.StopReading();
+
+            GPGSVUpdated.Should().BeTrue();
+        }
+
+        [Theory]
         [InlineData("$GPGGA,123519,4807.038,N,01131.324,E,1,08,0.9,545.4,M,46.9,M,,*42")]
         public void Test_GPGGAEventArgs(string inputNemm)
         {
@@ -151,5 +167,65 @@ namespace GPSReader.Tests
             value.ModeIndicator.Should().Be("N");
             value.Checksum.Should().Be("48");
         }
+
+        [Theory]
+        [InlineData("$GPGSV,3,1,12,05,22,165,31,06,31,041,27,11,69,043,33,12,76,332,36*74",
+            "3", "1", "12", 4,
+            "05", "22", "165", "31",
+            "06", "31", "041", "27",
+            "11", "69", "043", "33",
+            "12", "76", "332", "36")]
+        [InlineData("$GPGSV,3,2,12,19,12,074,28,20,46,130,27,24,24,210,16,25,42,316,29*74",
+            "3", "2", "12", 4,
+            "19", "12", "074", "28",
+            "20", "46", "130", "27",
+            "24", "24", "210", "16",
+            "25", "42", "316", "29")]
+        [InlineData("$GPGSV,3,3,12,28,04,325,,29,18,280,09,46,49,200,29,48,50,193,38*7E",
+            "3", "3", "12", 4,
+            "28", "04", "325", "",
+            "29", "18", "280", "09",
+            "46", "49", "200", "29",
+            "48", "50", "193", "38")]
+        public void Test_GPGSVEventArgs(string inputNemm, string DataCount, string MessageNumber,
+            string SatellitesInView, int SatellitesCount,
+            string SatelliteNumber1, string Elevation1, string Azimuth1, string SNR1,
+            string SatelliteNumber2, string Elevation2, string Azimuth2, string SNR2,
+            string SatelliteNumber3, string Elevation3, string Azimuth3, string SNR3,
+            string SatelliteNumber4, string Elevation4, string Azimuth4, string SNR4)
+        {
+            gpsReader.StartReading();
+            GPGSVEventArgs gpgsvEventArgs = null;
+
+            gpsReader.OnGPGSVUpdated += (sender, e) => gpgsvEventArgs = e;
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+
+            gpsReader.StopReading();
+
+            // Assert
+            gpgsvEventArgs.Should().NotBeNull();
+            var value = gpgsvEventArgs.GPGSVData;
+            value.DataCount.Should().Be(DataCount);
+            value.MessageNumber.Should().Be(MessageNumber);
+            value.SatellitesInView.Should().Be(SatellitesInView);
+            value.Satellites.Count.Should().Be(SatellitesCount);
+            value.Satellites[0].SatelliteNumber.Should().Be(SatelliteNumber1);
+            value.Satellites[0].Elevation.Should().Be(Elevation1);
+            value.Satellites[0].Azimuth.Should().Be(Azimuth1);
+            value.Satellites[0].SNR.Should().Be(SNR1);
+            value.Satellites[1].SatelliteNumber.Should().Be(SatelliteNumber2);
+            value.Satellites[1].Elevation.Should().Be(Elevation2);
+            value.Satellites[1].Azimuth.Should().Be(Azimuth2);
+            value.Satellites[1].SNR.Should().Be(SNR2);
+            value.Satellites[2].SatelliteNumber.Should().Be(SatelliteNumber3);
+            value.Satellites[2].Elevation.Should().Be(Elevation3);
+            value.Satellites[2].Azimuth.Should().Be(Azimuth3);
+            value.Satellites[2].SNR.Should().Be(SNR3);
+            value.Satellites[3].SatelliteNumber.Should().Be(SatelliteNumber4);
+            value.Satellites[3].Elevation.Should().Be(Elevation4);
+            value.Satellites[3].Azimuth.Should().Be(Azimuth4);
+            value.Satellites[3].SNR.Should().Be(SNR4);
+        }
     }
-}
+} 
