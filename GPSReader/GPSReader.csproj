@@ -11,7 +11,6 @@
     <RepositoryUrl>https://github.com/ieei0214/GPSReader</RepositoryUrl>
     <PackageTags>GPS NMEA 0183 Parser</PackageTags>
     <Title>GPSReader</Title>
-    <PackageIcon>gpsreader.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
     <Copyright>© 2024 Jui-Hsiang Liu</Copyright>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -23,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="gpsreader.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
 	<None Include="..\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 </Project>
