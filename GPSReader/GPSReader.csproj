@@ -4,11 +4,29 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Authors>Ricky Liu</Authors>
+    <Description>A library for parsing NMEA sentences from GPS devices.</Description>
+    <PackageProjectUrl>https://github.com/ieei0214/GPSReader</PackageProjectUrl>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>    
+    <RepositoryUrl>https://github.com/ieei0214/GPSReader</RepositoryUrl>
+    <PackageTags>GPS NMEA 0183 Parser</PackageTags>
+    <Title>GPSReader</Title>
+    <PackageIcon>gpsreader.png</PackageIcon>
+    <RepositoryType>git</RepositoryType>
+    <Copyright>© 2024 Jui-Hsiang Liu</Copyright>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-    <PackageReference Include="System.IO.Ports" Version="8.0.0-rc.1.23419.4" />
+    <PackageReference Include="System.IO.Ports" Version="8.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="gpsreader.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+	<None Include="..\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
 </Project>
