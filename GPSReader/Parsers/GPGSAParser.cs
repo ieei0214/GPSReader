@@ -10,7 +10,7 @@ public class GPGSAParser : BaseNMEAParser
 {
     public override string SentenceId => "GPGSA";
 
-    public override bool TryParse(string sentence, out NMEAEventArgs eventArgs)
+    public override bool TryParse(string sentence, out NMEAEventArgs? eventArgs)
     {
         if (sentence.StartsWith($"${SentenceId}"))
         {

@@ -6,7 +6,7 @@ namespace GPSReader.Interfaces;
 public abstract class BaseNMEAParser
 {
     public abstract string SentenceId { get; }
-    public abstract bool TryParse(string sentence, out NMEAEventArgs eventArgs);
+    public abstract bool TryParse(string sentence, out NMEAEventArgs? eventArgs);
 
     protected (string[] fields, string checkSum) GetFieldAndChecksum(string sentence)
     {

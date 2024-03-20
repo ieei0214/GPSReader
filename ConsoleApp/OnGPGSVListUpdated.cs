@@ -20,7 +20,7 @@ internal partial class Program
                         new Label($"ID: {d.MessageNumber}/{e.GPGSVListData.Count} Number: {d.SatellitesInView} Checksum: {d.Checksum}") { Y = y++ }
                     );
 
-                    foreach (var s in d.Satellites)
+                    foreach (var s in d.Satellites!)
                     {
                         gpgsvWindow.Add(
                             new Label($"   {s.SatelliteNumber} : Elevation: {s.Elevation} Azimuth: {s.Azimuth} SNR: {s.SNR}") { Y = y++ }

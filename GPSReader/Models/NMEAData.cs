@@ -2,7 +2,7 @@
 
 public class NMEAData
 {
-    public string Checksum { get; set; }
+    public string? Checksum { get; set; }
 
     protected static bool IsFieldNotEmpty(string field)
     {

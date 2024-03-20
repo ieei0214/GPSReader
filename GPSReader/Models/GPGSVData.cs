@@ -58,8 +58,8 @@ GPS Satellites in View（GSV）可见卫星信息
 
 public class Satellite
 {
-    public string SatelliteNumber { get; set; }
-    public string Elevation { get; set; }
-    public string Azimuth { get; set; }
-    public string SNR { get; set; }
+    public string? SatelliteNumber { get; set; }
+    public string? Elevation { get; set; }
+    public string? Azimuth { get; set; }
+    public string? SNR { get; set; }
 }

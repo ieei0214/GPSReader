@@ -14,7 +14,7 @@ internal partial class Program
                 gpgsaWindow.RemoveAll();
                 int y = 0;
                 // convert the list of satellites to a string
-                var satellites = string.Join(", ", e.GPGSAData.Satellites);
+                var satellites = string.Join(", ", e.GPGSAData.Satellites ?? throw new InvalidOperationException());
                 gpgsaWindow.Add(
                     new Label($"Raw Data: {e.RawData}") { Y = y++ },
                     new Label($"Mode: {e.GPGSAData.Mode}") { Y = y++ },

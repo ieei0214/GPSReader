@@ -13,7 +13,6 @@ public class GPGGAData : NMEAData
     public double? GeoidHeight { get; set; }
     public string? GeoidHeightUnits { get; set; }
     public string? DGPSDataAge { get; set; }
-    public string? Checksum { get; set; }
 
     public static GPGGAData CreateFromFields(string[] fields)
     {

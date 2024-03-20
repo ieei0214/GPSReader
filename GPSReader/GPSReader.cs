@@ -12,11 +12,11 @@ public class GPSReaderService
 
     private List<GPGSVData> _listGPGSVDatas = new List<GPGSVData>();
 
-    public event EventHandler<GPGGAEventArgs> OnGPGGAUpdated;
-    public event EventHandler<GPGSAEventArgs> OnGPGSAUpdated;
-    public event EventHandler<GPGLLEventArgs> OnGPGLLUpdated;
-    public event EventHandler<GPGSVEventArgs> OnGPGSVUpdated;
-    public event EventHandler<GPGSVListEventArgs> OnGPGSVListUpdated;
+    public event EventHandler<GPGGAEventArgs>? OnGPGGAUpdated;
+    public event EventHandler<GPGSAEventArgs>? OnGPGSAUpdated;
+    public event EventHandler<GPGLLEventArgs>? OnGPGLLUpdated;
+    public event EventHandler<GPGSVEventArgs>? OnGPGSVUpdated;
+    public event EventHandler<GPGSVListEventArgs>? OnGPGSVListUpdated;
 
     public GPSReaderService(ILogger<GPSReaderService> logger, INMEAInput input, List<BaseNMEAParser> parsers)
     {
@@ -58,18 +58,20 @@ public class GPSReaderService
         }
     }
 
-    private void DataReceived(object sender, InputReceivedEventArgs e)
+    private void DataReceived(object? sender, InputReceivedEventArgs e)
     {
-        string data = e.Data;
+        string? data = e.Data;
         _logger.LogDebug(data);
-        string[] sentences = data.Split('\n');
+        string[] sentences = data!.Split('\n');
 
         foreach (string sentence in sentences)
         {
             foreach (var parser in _parsers)
             {
-                if (parser.TryParse(sentence, out NMEAEventArgs eventArgs))
+                if (parser.TryParse(sentence, out NMEAEventArgs? eventArgs))
                 {
+                    if (eventArgs == null)
+                        continue;
                     switch (eventArgs)
                     {
                         case GPGGAEventArgs gpggaEventArgs:
@@ -84,13 +86,14 @@ public class GPSReaderService
                         case GPGSVEventArgs gpgsvEventArgs:
                             _listGPGSVDatas.Add(gpgsvEventArgs.GPGSVData);
                             OnGPGSVUpdated?.Invoke(this, gpgsvEventArgs);
-                            if (_listGPGSVDatas.Count == Int32.Parse(gpgsvEventArgs.GPGSVData.DataCount))
+                            if (gpgsvEventArgs.GPGSVData.DataCount != null &&
+                                int.TryParse(gpgsvEventArgs.GPGSVData.DataCount, out int dataCount) &&
+                                _listGPGSVDatas.Count == dataCount)
                             {
                                 OnGPGSVListUpdated?.Invoke(this,
                                     new GPGSVListEventArgs(new List<GPGSVData>(_listGPGSVDatas)));
                                 _listGPGSVDatas.Clear();
                             }
-
                             break;
                     }
                 }

@@ -14,7 +14,7 @@ internal partial class Program
             {
                 gpgllWindow.RemoveAll();
                 int y = 0;
-                var utcTime = DateTime.ParseExact(e.GPGLLData.UTC, "HHmmss.ff", CultureInfo.InvariantCulture);
+                var utcTime = DateTime.ParseExact(e.GPGLLData.UTC!, "HHmmss.ff", CultureInfo.InvariantCulture);
 
                 gpgllWindow.Add(
                     new Label($"Raw Data: {e.RawData}") { Y = y++ },
