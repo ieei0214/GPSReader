@@ -1,10 +1,11 @@
-﻿using Terminal.Gui;
+﻿using GPSReader.Interfaces;
+using Terminal.Gui;
 
 namespace ConsoleApp;
 
 internal partial class Program
 {
-    private static void OnSerialDataReceived(SerialInput serialInput, Window inputWindow)
+    private static void OnDataReceived(INMEAInput serialInput, Window inputWindow)
     {
         serialInput.DataReceived += (sender, e) =>
         {

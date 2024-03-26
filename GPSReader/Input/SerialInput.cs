@@ -7,11 +7,17 @@ namespace ConsoleApp;
 
 public class SerialInput : INMEAInput
 {
-    private string comPortName = "COM12";
+    private string comPortName = "COM1";
     private int baudRate = 115200;
     private SerialPort? serialPort;
 
     public event EventHandler<InputReceivedEventArgs>? DataReceived;
+
+    public SerialInput(string comPortName, int baudRate)
+    {
+        this.comPortName = comPortName;
+        this.baudRate = baudRate;
+    }
 
     public void Open()
     {

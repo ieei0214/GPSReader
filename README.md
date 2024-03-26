@@ -4,6 +4,7 @@ GPSReader is a C# library designed to parse NMEA 0183 sentences from GPS devices
 
 ## Features
 
+- Supports reading NMEA sentences from a serial port(real-time) or a file(simulation purpose).
 - Supports multiple NMEA sentence types (GPGGA, GPGSA, GPGLL, GPGSV).
 - Event-driven architecture allows for real-time processing of GPS data.
 - Customizable parser list allows for easy addition of new sentence types.
@@ -44,8 +45,9 @@ gpsReaderService.OnGPGSAUpdated += (sender, args) =>
 ```
 
 ## Example
-You can find an example of how to use GPSReader in the `Example` project. This project contains a simple console application that reads GPS data from a file and prints the parsed data to the console.
+You can find an example of how to use GPSReader in the `ConsoleApp` project under example folder. This project contains a simple console application that reads GPS data from a file and prints the parsed data to the console.
 
+[README.md](README.md)
 Screenshot of the example output:
 ![screenshot.jpg](ConsoleApp/screenshot.jpg)
 

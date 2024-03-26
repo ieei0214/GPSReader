@@ -17,5 +17,9 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Terminal.Gui" Version="1.16.0" />
   </ItemGroup>
+  
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="copy /Y &quot;$(ProjectDir)TestData\example.txt&quot; &quot;$(TargetDir)&quot;" />
+  </Target>
 
 </Project>
