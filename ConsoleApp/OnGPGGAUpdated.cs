@@ -14,10 +14,10 @@ internal partial class Program
             {
                 gpggaWindow.RemoveAll();
                 int y = 0;
-                var utcTime = DateTime.ParseExact(e.GPGGAData.UTC!, "HHmmss.ff", CultureInfo.InvariantCulture);
+                var utcTime = DateTime.ParseExact(e.GPGGAData.UTC!, "HHmmss.ff", new CultureInfo("en-US"));
                 gpggaWindow.Add(
                     new Label($"Raw Data: {e.RawData}") { Y = y++ },
-                    new Label($"UTC: {e.GPGGAData.UTC} {utcTime.ToString()}") { Y = y++ },
+                    new Label($"UTC: {e.GPGGAData.UTC} ({utcTime.ToString(new CultureInfo("en-US"))})") { Y = y++ },
                     new Label($"Latitude: {e.GPGGAData.Latitude}") { Y = y++ },
                     new Label($"Longitude: {e.GPGGAData.Longitude}") { Y = y++ },
                     new Label($"Quality: {e.GPGGAData.Quality}") { Y = y++ },
