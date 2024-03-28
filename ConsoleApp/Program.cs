@@ -13,9 +13,6 @@ namespace ConsoleApp
             // 2. File
             Console.WriteLine("Select input type: \n1. Serial Port \n2. File(example.txt for simulation)");
             var inputType = Console.ReadLine();
-            
-            Application.Init();
-            var (inputWindow, gpggaWindow, gpgsaWindow, gpgllWindow, gpgsvWindow) = CreateWindows();
 
             var logger = CreateLogger();
 
@@ -23,14 +20,25 @@ namespace ConsoleApp
 
             if (inputType == "1")
             {
-                input = new SerialInput("COM7", 115200);
+                // Get all available serial ports and let the user select one
+                var ports = System.IO.Ports.SerialPort.GetPortNames();
+                Console.WriteLine("Select a serial port:");
+                for (int i = 0; i < ports.Length; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {ports[i]}");
+                }
+
+                var p = Console.ReadLine();
+                input = new SerialInput(ports[int.Parse(p) - 1], 115200);
             }
             else
             {
                 input = new FileInput(@"example.txt");
             }
-            
             var gpsReaderService = new GPSReaderService(logger, input);
+            
+            Application.Init();
+            var (inputWindow, gpggaWindow, gpgsaWindow, gpgllWindow, gpgsvWindow) = CreateWindows();
             
             OnDataReceived(input, inputWindow);
             OnGPGGAUpdated(gpsReaderService, gpggaWindow);
