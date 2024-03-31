@@ -1,5 +1,7 @@
 # GPSReader
 
+[![NuGet version ()](https://img.shields.io/nuget/v/GPSReader)](https://www.nuget.org/packages/GPSReader/)
+
 GPSReader is a C# library designed to parse NMEA 0183 sentences from GPS devices. It provides a flexible and extensible way to handle different types of NMEA sentences.
 
 ## Features
