@@ -13,6 +13,7 @@ public class GPSReaderService
     private List<GPGSVData> _listGPGSVDatas = new List<GPGSVData>();
 
     public event EventHandler<GPGGAEventArgs>? OnGPGGAUpdated;
+    public event EventHandler<GNGGAEventArgs>? OnGNGGAUpdated;
     public event EventHandler<GPGSAEventArgs>? OnGPGSAUpdated;
     public event EventHandler<GPGLLEventArgs>? OnGPGLLUpdated;
     public event EventHandler<GPGSVEventArgs>? OnGPGSVUpdated;
@@ -29,6 +30,7 @@ public class GPSReaderService
         : this(logger, input, new List<BaseNMEAParser>
         {
             new GPGGAParser(),
+            new GNGGAParser(),
             new GPGSAParser(),
             new GPGLLParser(),
             new GPGSVParser()
@@ -76,6 +78,9 @@ public class GPSReaderService
                     {
                         case GPGGAEventArgs gpggaEventArgs:
                             OnGPGGAUpdated?.Invoke(this, gpggaEventArgs);
+                            break;
+                        case GNGGAEventArgs gnggaEventArgs:
+                            OnGNGGAUpdated?.Invoke(this, gnggaEventArgs);
                             break;
                         case GPGSAEventArgs gpgsaEventArgs:
                             OnGPGSAUpdated?.Invoke(this, gpgsaEventArgs);

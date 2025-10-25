@@ -261,5 +261,149 @@ namespace GPSReader.Tests
             value[1].DataCount.Should().Be("3");
             value[2].DataCount.Should().Be("3");
         }
+
+        // GNGGA Tests - User Story 2
+
+        [Theory]
+        [InlineData("$GNGGA,123519,4807.038,N,01131.324,E,1,08,0.9,545.4,M,46.9,M,,*5C")]
+        public void Test_OnGNGGAUpdated(string inputNemm)
+        {
+            gpsReader.StartReading();
+            var GNGGAUpdated = false;
+
+            gpsReader.OnGNGGAUpdated += (sender, e) => GNGGAUpdated = true;
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+
+            gpsReader.StopReading();
+
+            GNGGAUpdated.Should().BeTrue();
+        }
+
+        [Theory]
+        [InlineData("$GNGGA,123519,4807.038,N,01131.324,E,1,08,0.9,545.4,M,46.9,M,,*5C")]
+        public void Test_GNGGAEventArgs_SimpleFormat(string inputNemm)
+        {
+            gpsReader.StartReading();
+            GNGGAEventArgs gnggaEventArgs = null;
+
+            gpsReader.OnGNGGAUpdated += (sender, e) => gnggaEventArgs = e;
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+
+            gpsReader.StopReading();
+
+            // Assert
+            gnggaEventArgs.Should().NotBeNull();
+            gnggaEventArgs.GNGGAData.UTC.Should().Be("123519");
+            double parsedLatitude = double.Parse(gnggaEventArgs.GNGGAData.Latitude, CultureInfo.InvariantCulture);
+            double parsedLongitude = double.Parse(gnggaEventArgs.GNGGAData.Longitude, CultureInfo.InvariantCulture);
+            parsedLatitude.Should().BeApproximately(48.1173, 0.0001);
+            parsedLongitude.Should().BeApproximately(11.5221, 0.0001);
+            gnggaEventArgs.GNGGAData.Quality.Should().Be(1);
+            gnggaEventArgs.GNGGAData.Satellites.Should().Be(8);
+            gnggaEventArgs.GNGGAData.HDOP.Should().BeApproximately(0.9, 0.001);
+            gnggaEventArgs.GNGGAData.Altitude.Should().BeApproximately(545.4, 0.1);
+            gnggaEventArgs.GNGGAData.AltitudeUnits.Should().Be("M");
+            gnggaEventArgs.GNGGAData.GeoidHeight.Should().BeApproximately(46.9, 0.1);
+            gnggaEventArgs.GNGGAData.GeoidHeightUnits.Should().Be("M");
+            gnggaEventArgs.GNGGAData.DGPSDataAge.Should().BeNull();
+            gnggaEventArgs.GNGGAData.Checksum.Should().Be("5C");
+            gnggaEventArgs.GNGGAData.ChecksumValid.Should().BeTrue();
+        }
+
+        [Theory]
+        [InlineData("$GNGGA,211921.00,3400.97900,N,11739.17621,W,2,12,0.86,247.6,M,-32.2,M,,0000*71")]
+        public void Test_GNGGAEventArgs_HighPrecisionFormat(string inputNemm)
+        {
+            gpsReader.StartReading();
+            GNGGAEventArgs gnggaEventArgs = null;
+
+            gpsReader.OnGNGGAUpdated += (sender, e) => gnggaEventArgs = e;
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+
+            gpsReader.StopReading();
+
+            // Assert
+            gnggaEventArgs.Should().NotBeNull();
+            gnggaEventArgs.GNGGAData.UTC.Should().Be("211921.00");
+            gnggaEventArgs.GNGGAData.UTCDateTime.Should().NotBeNull();
+            gnggaEventArgs.GNGGAData.UTCDateTime.Value.Hour.Should().Be(21);
+            gnggaEventArgs.GNGGAData.UTCDateTime.Value.Minute.Should().Be(19);
+            gnggaEventArgs.GNGGAData.UTCDateTime.Value.Second.Should().Be(21);
+            double parsedLatitude = double.Parse(gnggaEventArgs.GNGGAData.Latitude, CultureInfo.InvariantCulture);
+            double parsedLongitude = double.Parse(gnggaEventArgs.GNGGAData.Longitude, CultureInfo.InvariantCulture);
+            parsedLatitude.Should().BeApproximately(34.0163166, 0.0001);
+            parsedLongitude.Should().BeApproximately(-117.6529368, 0.0001);
+            gnggaEventArgs.GNGGAData.Quality.Should().Be(2);
+            gnggaEventArgs.GNGGAData.Satellites.Should().Be(12);
+            gnggaEventArgs.GNGGAData.HDOP.Should().BeApproximately(0.86, 0.001);
+            gnggaEventArgs.GNGGAData.Altitude.Should().BeApproximately(247.6, 0.1);
+            gnggaEventArgs.GNGGAData.GeoidHeight.Should().BeApproximately(-32.2, 0.1);
+            gnggaEventArgs.GNGGAData.DGPSStationID.Should().Be("0000");
+            gnggaEventArgs.GNGGAData.ChecksumValid.Should().BeTrue();
+        }
+
+        [Theory]
+        [InlineData("$GNGGA,123519,4807.038,N,01131.324,E,1,08,0.9,545.4,M,46.9,M,,*FF")]
+        public void Test_GNGGAInvalidChecksum(string inputNemm)
+        {
+            gpsReader.StartReading();
+            GNGGAEventArgs gnggaEventArgs = null;
+
+            gpsReader.OnGNGGAUpdated += (sender, e) => gnggaEventArgs = e;
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+
+            gpsReader.StopReading();
+
+            // Assert - Event should still fire with lenient checksum handling
+            gnggaEventArgs.Should().NotBeNull();
+            gnggaEventArgs.GNGGAData.ChecksumValid.Should().BeFalse();
+            gnggaEventArgs.GNGGAData.UTC.Should().Be("123519");
+        }
+
+        [Theory]
+        [InlineData("$GNGGA,123519,4807.038,N")]
+        public void Test_GNGGAInsufficientFields(string inputNemm)
+        {
+            gpsReader.StartReading();
+            GNGGAEventArgs gnggaEventArgs = null;
+
+            gpsReader.OnGNGGAUpdated += (sender, e) => gnggaEventArgs = e;
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+
+            gpsReader.StopReading();
+
+            // Assert - Event should NOT fire for malformed sentence
+            gnggaEventArgs.Should().BeNull();
+        }
+
+        [Theory]
+        [InlineData("$GNGGA,123519,9507.038,N,20131.324,E,15,08,0.9,545.4,M,46.9,M,,*4D")]
+        public void Test_GNGGAOutOfRangeValues(string inputNemm)
+        {
+            gpsReader.StartReading();
+            GNGGAEventArgs gnggaEventArgs = null;
+
+            gpsReader.OnGNGGAUpdated += (sender, e) => gnggaEventArgs = e;
+            mockInputSource.DataReceived +=
+                Raise.Event<EventHandler<InputReceivedEventArgs>>(this, new InputReceivedEventArgs(inputNemm));
+
+            gpsReader.StopReading();
+
+            // Assert - Event should still fire with lenient semantic validation
+            gnggaEventArgs.Should().NotBeNull();
+            double parsedLatitude = double.Parse(gnggaEventArgs.GNGGAData.Latitude, CultureInfo.InvariantCulture);
+            double parsedLongitude = double.Parse(gnggaEventArgs.GNGGAData.Longitude, CultureInfo.InvariantCulture);
+            // Latitude > 90 (invalid)
+            parsedLatitude.Should().BeGreaterThan(90);
+            // Longitude > 180 (invalid)
+            parsedLongitude.Should().BeGreaterThan(180);
+            // Quality > 9 (invalid)
+            gnggaEventArgs.GNGGAData.Quality.Should().BeGreaterThan(9);
+        }
     }
 } 

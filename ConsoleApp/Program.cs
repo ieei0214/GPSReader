@@ -38,10 +38,11 @@ namespace ConsoleApp
             var gpsReaderService = new GPSReaderService(logger, input);
             
             Application.Init();
-            var (inputWindow, gpggaWindow, gpgsaWindow, gpgllWindow, gpgsvWindow) = CreateWindows();
-            
+            var (inputWindow, gpggaWindow, gnggaWindow, gpgsaWindow, gpgllWindow, gpgsvWindow) = CreateWindows();
+
             OnDataReceived(input, inputWindow);
             OnGPGGAUpdated(gpsReaderService, gpggaWindow);
+            OnGNGGAUpdated(gpsReaderService, gnggaWindow);
             OnGPGSAUpdated(gpsReaderService, gpgsaWindow);
             OnGPGLLUpdated(gpsReaderService, gpgllWindow);
             OnGPGSVListUpdated(gpsReaderService, gpgsvWindow);

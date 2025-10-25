@@ -7,6 +7,7 @@ internal partial class Program
     private static (
         Window inputWindot,
         Window gpggaWindow,
+        Window gnggaWindow,
         Window gpgsaWindow,
         Window gpgllWindow,
         Window gpgsvWindow
@@ -18,9 +19,11 @@ internal partial class Program
         var inputWindow = new Window("Input")
             { X = 0, Y = 1, Width = Dim.Fill(), Height = 10 };
         var gpggaWindow = new Window("GPGGA Data")
-            { X = 0, Y = Pos.Bottom(inputWindow), Width = Dim.Fill(), Height = 13 };
+            { X = 0, Y = Pos.Bottom(inputWindow), Width = Dim.Percent(50), Height = 14 };
+        var gnggaWindow = new Window("GNGGA Data")
+            { X = Pos.Right(gpggaWindow), Y = Pos.Bottom(inputWindow), Width = Dim.Percent(50), Height = 14 };
         var gpgsaWindow = new Window("GPGSA Data")
-            { X = 0, Y = Pos.Bottom(gpggaWindow), Width = Dim.Fill(), Height = 10 };
+            { X = 0, Y = Pos.Bottom(gnggaWindow), Width = Dim.Fill(), Height = 10 };
         var gpgllWindow = new Window("GPGLL Data")
             { X = 0, Y = Pos.Bottom(gpgsaWindow), Width = Dim.Fill(), Height = 9 };
         var gpgsvWindow = new Window("GPGSV Data")
@@ -33,7 +36,7 @@ internal partial class Program
             }),
         });
 
-        top.Add(menu, inputWindow, gpggaWindow, gpgsaWindow, gpgllWindow, gpgsvWindow);
-        return (inputWindow, gpggaWindow, gpgsaWindow, gpgllWindow, gpgsvWindow);
+        top.Add(menu, inputWindow, gpggaWindow, gnggaWindow, gpgsaWindow, gpgllWindow, gpgsvWindow);
+        return (inputWindow, gpggaWindow, gnggaWindow, gpgsaWindow, gpgllWindow, gpgsvWindow);
     }
 }
